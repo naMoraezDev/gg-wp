@@ -15,6 +15,13 @@ define('SECURE_AUTH_SALT', '|mVQHkj;I;SCnBIf Q8%.#8G^@4SL(fF):GuJE]v+qi#?+XJ;5B-
 define('LOGGED_IN_SALT',   'HcW{RZNaEp,.8:In{2)]6Tspy!<{Gy-wmzgzzfl2(x[3,T`Nb]?,](:f~&d~(-4E');
 define('NONCE_SALT',       'w($+VGTsGS:sGcL+Y%7#u}r+#$Of^:aLQv>5up>zutz3}}E;qdv[1xh9JyNX/`tS');
 
+define('WP_STATELESS_MEDIA_MODE', 'cdn');
+define('WP_STATELESS_MEDIA_BUCKET', 'gg-wp');
+define('WP_STATELESS_MEDIA_KEY_FILE_PATH', '/var/www/html/gcs-key.json');
+define('WP_STATELESS_MEDIA_ROOT_DIR', 'wp-content/uploads');
+define('WP_STATELESS_MEDIA_CREATE_BUCKET', false);
+define('WP_STATELESS_MEDIA_CACHE_CONTROL', 'public,max-age=3600');
+
 $table_prefix = 'wp_';
 
 define( 'WP_DEBUG', false );
