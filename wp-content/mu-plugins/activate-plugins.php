@@ -7,7 +7,7 @@ add_action('init', function () {
     $plugins_to_activate = [
         'advanced-custom-fields/acf.php',
         'wp-graphql/wp-graphql.php',
-        'wp-graphql-acf/wp-graphql-acf.php',
+        'wp-graphql-acf/wpgraphql-acf.php',
     ];
 
     foreach ($plugins_to_activate as $plugin) {
