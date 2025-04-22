@@ -1,4 +1,6 @@
 <?php
+define('WPLANG', 'pt_BR');
+
 // Banco de dados
 define('DB_NAME', getenv('WORDPRESS_DB_NAME') ?: 'wpdb');
 define('DB_USER', getenv('WORDPRESS_DB_USER') ?: 'wpuser');
