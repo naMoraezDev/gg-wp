@@ -8,6 +8,7 @@ add_action('init', function () {
         'advanced-custom-fields/acf.php',
         'wp-graphql/wp-graphql.php',
         'wpgraphql-acf/wpgraphql-acf.php',
+        'wp-stateless/wp-stateless-media.php',
     ];
 
     foreach ($plugins_to_activate as $plugin) {

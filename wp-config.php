@@ -16,8 +16,8 @@ define('LOGGED_IN_SALT',   'HcW{RZNaEp,.8:In{2)]6Tspy!<{Gy-wmzgzzfl2(x[3,T`Nb]?,
 define('NONCE_SALT',       'w($+VGTsGS:sGcL+Y%7#u}r+#$Of^:aLQv>5up>zutz3}}E;qdv[1xh9JyNX/`tS');
 
 define('WP_STATELESS_MEDIA_MODE', 'cdn');
-define('WP_STATELESS_MEDIA_BUCKET', 'gg-wp');
-define('WP_STATELESS_MEDIA_KEY_FILE_PATH', '/var/www/html/gcs-key.json');
+define('WP_STATLESS_MEDIA_BUCKET', getenv('WP_STATLESS_GCS_BUCKET_NAME'));
+define('WP_STATLESS_MEDIA_KEY_FILE', getenv('WP_STATLESS_GCS_KEY_FILE'));
 define('WP_STATELESS_MEDIA_ROOT_DIR', 'wp-content/uploads');
 define('WP_STATELESS_MEDIA_CREATE_BUCKET', false);
 define('WP_STATELESS_MEDIA_CACHE_CONTROL', 'public,max-age=3600');
