@@ -21,6 +21,7 @@ define('WP_STATLESS_MEDIA_KEY_FILE', getenv('WP_STATLESS_GCS_KEY_FILE'));
 define('WP_STATELESS_MEDIA_ROOT_DIR', 'wp-content/uploads');
 define('WP_STATELESS_MEDIA_CREATE_BUCKET', false);
 define('WP_STATELESS_MEDIA_CACHE_CONTROL', 'public,max-age=3600');
+define('WP_STATLESS_UPLOAD_LOCAL', true); 
 
 $table_prefix = 'wp_';
 
