@@ -12,7 +12,8 @@ RUN curl -L https://downloads.wordpress.org/plugin/wp-stateless.latest-stable.zi
     unzip /tmp/wp-stateless.zip -d /var/www/html/wp-content/plugins/
 
 # Copia wp-content e wp-config.php
-COPY wp-content /var/www/html/wp-content
+COPY wp-content/plugins /var/www/html/wp-content/plugins
+COPY wp-content/mu-plugins /var/www/html/wp-content/mu-plugins
 COPY wp-config.php /var/www/html/wp-config.php
 
 # Copia .htaccess padrão do WordPress
