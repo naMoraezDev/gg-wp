@@ -140,7 +140,7 @@ endif;
 add_action( 'init', 'twentytwentyfive_register_block_bindings' );
 
 add_action('rest_api_init', function () {
-	register_rest_route('custom/v1', '/ping', [
+	register_rest_route('custom/v1', '/health', [
 			'methods' => 'GET',
 			'callback' => fn() => new WP_REST_Response(['status' => 'ok'], 200),
 			'permission_callback' => '__return_true',
