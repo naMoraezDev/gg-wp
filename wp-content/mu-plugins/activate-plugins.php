@@ -9,6 +9,7 @@ add_action('init', function () {
         'wp-graphql/wp-graphql.php',
         'wpgraphql-acf/wpgraphql-acf.php',
         'wp-stateless/wp-stateless-media.php',
+        'wp-graphql-offset-pagination/plugin.php'
     ];
 
     foreach ($plugins_to_activate as $plugin) {
