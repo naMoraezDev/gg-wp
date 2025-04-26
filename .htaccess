@@ -47,11 +47,9 @@ Require all denied
 </FilesMatch>
 
 # Bloquear execução de arquivos PHP dentro de /uploads
-<Directory "/var/www/html/wp-content/uploads">
-    <Files "*.php">
-        Require all denied
-    </Files>
-</Directory>
+<FilesMatch "^wp-content/uploads/.*\.php$">
+    Require all denied
+</FilesMatch>
 
 # Desabilitar listagem de diretórios
 Options -Indexes
