@@ -24,6 +24,9 @@ define('WP_STATLESS_MEDIA_CREATE_BUCKET', false);
 define('WP_STATLESS_MEDIA_CACHE_CONTROL', 'public,max-age=3600');
 define('WP_STATLESS_UPLOAD_LOCAL', true);
 
+define('GG_API_BASE_URL', getenv('GG_API_BASE_URL'));
+define('GG_API_KEY', getenv('GG_API_KEY'));
+
 $table_prefix = 'wp_';
 
 define('WP_DEBUG', false);
