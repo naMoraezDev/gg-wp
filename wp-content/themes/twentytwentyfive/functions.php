@@ -153,9 +153,9 @@ add_action('rest_api_init', function () {
 	]);
 });
 
-add_action('save_post', 'notify_clearing_category_and_post_cache', 10, 3);
+add_action('save_post', 'notify_clearing_cache_on_post_save', 10, 3);
 
-function notify_clearing_category_and_post_cache($post_ID, $post, $update)
+function notify_clearing_cache_on_post_save($post_ID, $post, $update)
 {
 	if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE)
 		return;
@@ -166,25 +166,25 @@ function notify_clearing_category_and_post_cache($post_ID, $post, $update)
 
 	$endpoint = rtrim(GG_API_BASE_URL, '/') . '/v1/cache/keys';
 
-	// Slug da categoria principal
 	$categorias = get_the_category($post_ID);
 	if (!empty($categorias) && !is_wp_error($categorias)) {
-		$categoria_slug = $categorias[0]->slug;
-		$pattern_categoria = urlencode("posts:category:$categoria_slug*");
-		$url_categoria = $endpoint . "?pattern=$pattern_categoria";
+		foreach ($categorias as $categoria) {
+			$categoria_slug = $categoria->slug;
+			$pattern_categoria = urlencode("posts:category:$categoria_slug*");
+			$url_categoria = $endpoint . "?pattern=$pattern_categoria";
 
-		wp_remote_request($url_categoria, [
-			'method' => 'DELETE',
-			'timeout' => 5,
-			'blocking' => false,
-			'headers' => [
-				'accept' => '*/*',
-				'x-api-key' => GG_API_KEY,
-			],
-		]);
+			wp_remote_request($url_categoria, [
+				'method' => 'DELETE',
+				'timeout' => 5,
+				'blocking' => false,
+				'headers' => [
+					'accept' => '*/*',
+					'x-api-key' => GG_API_KEY,
+				],
+			]);
+		}
 	}
 
-	// Slug do post
 	$post_slug = $post->post_name;
 	$pattern_post = urlencode("posts:$post_slug");
 	$url_post = $endpoint . "?pattern=$pattern_post";
@@ -198,9 +198,26 @@ function notify_clearing_category_and_post_cache($post_ID, $post, $update)
 			'x-api-key' => GG_API_KEY,
 		],
 	]);
+
+	$tags = get_the_tags($post_ID);
+	if (!empty($tags) && !is_wp_error($tags)) {
+		foreach ($tags as $tag) {
+			$tag_slug = $tag->slug;
+			$pattern_tag = urlencode("posts:tag:$tag_slug*");
+			$url_tag = $endpoint . "?pattern=$pattern_tag";
+
+			wp_remote_request($url_tag, [
+				'method' => 'DELETE',
+				'timeout' => 5,
+				'blocking' => false,
+				'headers' => [
+					'accept' => '*/*',
+					'x-api-key' => GG_API_KEY,
+				],
+			]);
+		}
+	}
 }
-
-
 
 // Registers block binding callback function for the post format name.
 if (!function_exists('twentytwentyfive_format_binding')):
