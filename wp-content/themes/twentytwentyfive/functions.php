@@ -153,6 +153,23 @@ add_action('rest_api_init', function () {
 	]);
 });
 
+add_action('template_redirect', function () {
+	if (!is_admin() && !current_user_can('edit_posts')) {
+		$request_uri = $_SERVER['REQUEST_URI'];
+
+		if (
+			strpos($request_uri, '/wp-admin') !== 0 &&
+			strpos($request_uri, '/wp-login.php') !== 0 &&
+			strpos($request_uri, '/wp-json') !== 0 &&
+			strpos($request_uri, '/graphql') !== 0
+		) {
+			wp_redirect(admin_url());
+			exit;
+		}
+	}
+});
+
+
 add_action('save_post', 'notify_clearing_cache_on_post_save', 10, 3);
 
 function notify_clearing_cache_on_post_save($post_ID, $post, $update)
