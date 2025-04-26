@@ -158,10 +158,10 @@ add_action('template_redirect', function () {
 		$request_uri = $_SERVER['REQUEST_URI'];
 
 		if (
-			strpos($request_uri, '/wp-admin') !== 0 &&
-			strpos($request_uri, '/wp-login.php') !== 0 &&
 			strpos($request_uri, '/wp-json') !== 0 &&
-			strpos($request_uri, '/graphql') !== 0
+			strpos($request_uri, '/graphql') !== 0 &&
+			strpos($request_uri, '/wp-login.php') !== 0 &&
+			strpos($request_uri, '/wp-admin') !== 0
 		) {
 			wp_redirect(admin_url());
 			exit;
