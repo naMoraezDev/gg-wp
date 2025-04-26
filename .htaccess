@@ -1,59 +1,28 @@
 # BEGIN WordPress
 <IfModule mod_rewrite.c>
 RewriteEngine On
-
-# Base do WordPress
 RewriteBase /
 
-# Permitir acesso normal ao admin, login, API REST e GraphQL
-RewriteCond %{REQUEST_URI} ^/wp-admin [OR]
-RewriteCond %{REQUEST_URI} ^/wp-login\.php [OR]
-RewriteCond %{REQUEST_URI} ^/wp-json [OR]
-RewriteCond %{REQUEST_URI} ^/graphql
-RewriteRule .* - [L]
-
-# Redirecionar qualquer outra requisição para /wp-admin
-RewriteRule ^(.*)$ /wp-admin/ [R=302,L]
-
-# Regras padrão do WordPress para carregar o index.php
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule . /index.php [L]
 </IfModule>
 # END WordPress
 
-# =============================
-# Proteções extras de segurança
-# =============================
-
-# Bloquear acesso ao arquivo xmlrpc.php (não é usado em headless)
 <Files xmlrpc.php>
 Require all denied
 </Files>
 
-# Bloquear acesso ao wp-config.php
 <Files wp-config.php>
 Require all denied
 </Files>
 
-# Proteger .htaccess e outros arquivos sensíveis
 <FilesMatch "^(\.htaccess|\.htpasswd|\.env|readme\.html|license\.txt)$">
 Require all denied
 </FilesMatch>
 
-# Não permite acesso direto a arquivos que começam com ponto (.)
-<FilesMatch "^\.">
-Require all denied
-</FilesMatch>
-
-# Bloquear execução de arquivos PHP dentro de /uploads
 <FilesMatch "^wp-content/uploads/.*\.php$">
     Require all denied
 </FilesMatch>
 
-# Desabilitar listagem de diretórios
 Options -Indexes
-
-RewriteEngine On
-RewriteCond %{HTTPS} off
-RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
