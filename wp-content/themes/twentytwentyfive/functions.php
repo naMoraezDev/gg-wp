@@ -219,6 +219,85 @@ function notify_clearing_cache_on_post_save($post_ID, $post, $update)
 	}
 }
 
+add_action('edited_category', 'notify_clearing_cache_on_category_edit', 10, 2);
+
+function notify_clearing_cache_on_category_edit($term_id, $tt_id)
+{
+	if (!defined('GG_API_BASE_URL') || !defined('GG_API_KEY'))
+		return;
+
+	$endpoint = rtrim(GG_API_BASE_URL, '/') . '/v1/cache/keys';
+
+	$categoria = get_term($term_id, 'category');
+	if (is_wp_error($categoria) || !$categoria)
+		return;
+
+	$categoria_slug = $categoria->slug;
+
+	$url_geral = $endpoint . '/categories';
+	wp_remote_request($url_geral, [
+		'method' => 'DELETE',
+		'timeout' => 5,
+		'blocking' => false,
+		'headers' => [
+			'accept' => '*/*',
+			'x-api-key' => GG_API_KEY,
+		],
+	]);
+
+	$slug_codificado = urlencode("categories:$categoria_slug");
+	$url_especifico = $endpoint . "/$slug_codificado";
+	wp_remote_request($url_especifico, [
+		'method' => 'DELETE',
+		'timeout' => 5,
+		'blocking' => false,
+		'headers' => [
+			'accept' => '*/*',
+			'x-api-key' => GG_API_KEY,
+		],
+	]);
+}
+
+add_action('edited_post_tag', 'notify_clearing_cache_on_tag_edit', 10, 2);
+
+function notify_clearing_cache_on_tag_edit($term_id, $tt_id)
+{
+	if (!defined('GG_API_BASE_URL') || !defined('GG_API_KEY'))
+		return;
+
+	$endpoint = rtrim(GG_API_BASE_URL, '/') . '/v1/cache/keys';
+
+	$tag = get_term($term_id, 'post_tag');
+	if (is_wp_error($tag) || !$tag)
+		return;
+
+	$tag_slug = $tag->slug;
+
+	$url_geral = $endpoint . '/tags';
+	wp_remote_request($url_geral, [
+		'method' => 'DELETE',
+		'timeout' => 5,
+		'blocking' => false,
+		'headers' => [
+			'accept' => '*/*',
+			'x-api-key' => GG_API_KEY,
+		],
+	]);
+
+	$slug_codificado = urlencode("tags:$tag_slug");
+	$url_especifico = $endpoint . "/$slug_codificado";
+	wp_remote_request($url_especifico, [
+		'method' => 'DELETE',
+		'timeout' => 5,
+		'blocking' => false,
+		'headers' => [
+			'accept' => '*/*',
+			'x-api-key' => GG_API_KEY,
+		],
+	]);
+}
+
+
 // Registers block binding callback function for the post format name.
 if (!function_exists('twentytwentyfive_format_binding')):
 	/**
