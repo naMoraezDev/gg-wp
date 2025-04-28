@@ -166,14 +166,14 @@ function notify_clearing_cache_on_post_save($post_ID, $post, $update)
 
 	$endpoint = rtrim(GG_API_BASE_URL, '/') . '/v1/cache/keys';
 
-	$categorias = get_the_category($post_ID);
-	if (!empty($categorias) && !is_wp_error($categorias)) {
-		foreach ($categorias as $categoria) {
-			$categoria_slug = $categoria->slug;
-			$pattern_categoria = urlencode("posts:category:$categoria_slug*");
-			$url_categoria = $endpoint . "?pattern=$pattern_categoria";
+	$categories = get_the_category($post_ID);
+	if (!empty($categories) && !is_wp_error($categories)) {
+		foreach ($categories as $category) {
+			$category_slug = $category->slug;
+			$pattern_category = urlencode("posts:category:$category_slug*");
+			$url_category = $endpoint . "?pattern=$pattern_category";
 
-			wp_remote_request($url_categoria, [
+			wp_remote_request($url_category, [
 				'method' => 'DELETE',
 				'timeout' => 5,
 				'blocking' => false,
@@ -228,14 +228,14 @@ function notify_clearing_cache_on_category_edit($term_id, $tt_id)
 
 	$endpoint = rtrim(GG_API_BASE_URL, '/') . '/v1/cache/keys';
 
-	$categoria = get_term($term_id, 'category');
-	if (is_wp_error($categoria) || !$categoria)
+	$category = get_term($term_id, 'category');
+	if (is_wp_error($category) || !$category)
 		return;
 
-	$categoria_slug = $categoria->slug;
+	$category_slug = $category->slug;
 
-	$url_geral = $endpoint . '/categories';
-	wp_remote_request($url_geral, [
+	$general_url = $endpoint . '/categories';
+	wp_remote_request($general_url, [
 		'method' => 'DELETE',
 		'timeout' => 5,
 		'blocking' => false,
@@ -245,9 +245,9 @@ function notify_clearing_cache_on_category_edit($term_id, $tt_id)
 		],
 	]);
 
-	$slug_codificado = urlencode("categories:$categoria_slug");
-	$url_especifico = $endpoint . "/$slug_codificado";
-	wp_remote_request($url_especifico, [
+	$slug_encoded = urlencode("categories:$category_slug");
+	$specific_url = $endpoint . "/$slug_encoded";
+	wp_remote_request($specific_url, [
 		'method' => 'DELETE',
 		'timeout' => 5,
 		'blocking' => false,
@@ -273,8 +273,8 @@ function notify_clearing_cache_on_tag_edit($term_id, $tt_id)
 
 	$tag_slug = $tag->slug;
 
-	$url_geral = $endpoint . '/tags';
-	wp_remote_request($url_geral, [
+	$general_url = $endpoint . '/tags';
+	wp_remote_request($general_url, [
 		'method' => 'DELETE',
 		'timeout' => 5,
 		'blocking' => false,
@@ -284,9 +284,9 @@ function notify_clearing_cache_on_tag_edit($term_id, $tt_id)
 		],
 	]);
 
-	$slug_codificado = urlencode("tags:$tag_slug");
-	$url_especifico = $endpoint . "/$slug_codificado";
-	wp_remote_request($url_especifico, [
+	$slug_encoded = urlencode("tags:$tag_slug");
+	$specific_url = $endpoint . "/$slug_encoded";
+	wp_remote_request($specific_url, [
 		'method' => 'DELETE',
 		'timeout' => 5,
 		'blocking' => false,
@@ -297,50 +297,45 @@ function notify_clearing_cache_on_tag_edit($term_id, $tt_id)
 	]);
 }
 
-function pre_selecionar_posts_mesma_categoria($field)
+function pre_select_posts_same_category($field)
 {
-	// Verifica se estamos editando um post
 	global $post;
 	if (!$post) {
 		return $field;
 	}
 
-	// Pega as categorias do post atual
-	$categorias = get_the_category($post->ID);
-	if (empty($categorias)) {
+	$categories = get_the_category($post->ID);
+	if (empty($categories)) {
 		return $field;
 	}
 
-	// Pega o ID da primeira categoria (pode ajustar se quiser múltiplas)
-	$categoria_id = $categorias[0]->term_id;
+	$category_id = $categories[0]->term_id;
 
-	// Busca os 3 posts mais recentes da mesma categoria
 	$args = array(
 		'post_type' => 'post',
 		'posts_per_page' => 3,
-		'post__not_in' => array($post->ID), // não incluir o próprio post
+		'post__not_in' => array($post->ID),
 		'orderby' => 'date',
 		'order' => 'DESC',
 		'tax_query' => array(
 			array(
 				'taxonomy' => 'category',
 				'field' => 'term_id',
-				'terms' => $categoria_id,
+				'terms' => $category_id,
 			),
 		),
 	);
 
-	$recentes = get_posts($args);
+	$recents = get_posts($args);
 
-	if ($recentes) {
-		$field['default_value'] = wp_list_pluck($recentes, 'ID');
+	if ($recents) {
+		$field['default_value'] = wp_list_pluck($recents, 'ID');
 	}
 
 	return $field;
 }
 
-// Troque 'seu_nome_do_campo' pelo field name (não o label) do ACF
-add_filter('acf/load_field/name=related_posts', 'pre_selecionar_posts_mesma_categoria');
+add_filter('acf/load_field/name=related_posts', 'pre_select_posts_same_category');
 
 // Registers block binding callback function for the post format name.
 if (!function_exists('twentytwentyfive_format_binding')):
