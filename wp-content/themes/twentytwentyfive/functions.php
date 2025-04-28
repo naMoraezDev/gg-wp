@@ -337,6 +337,48 @@ function pre_select_posts_same_category($field)
 
 add_filter('acf/load_field/name=related_posts', 'pre_select_posts_same_category');
 
+function fill_acf_after_creating_post($post_id, $post, $update)
+{
+	if ($update) {
+		return;
+	}
+
+	if ($post->post_type !== 'post') {
+		return;
+	}
+
+	$categories = get_the_category($post_id);
+	if (empty($categories)) {
+		return;
+	}
+
+	$category_id = $categories[0]->term_id;
+
+	$args = array(
+		'post_type' => 'post',
+		'posts_per_page' => 3,
+		'post__not_in' => array($post_id),
+		'orderby' => 'date',
+		'order' => 'DESC',
+		'tax_query' => array(
+			array(
+				'taxonomy' => 'category',
+				'field' => 'term_id',
+				'terms' => $category_id,
+			),
+		),
+	);
+
+	$related = get_posts($args);
+
+	if ($related) {
+		$ids = wp_list_pluck($related, 'ID');
+		update_field('related_posts', $ids, $post_id);
+	}
+}
+
+add_action('save_post', 'fill_acf_after_creating_post', 20, 3);
+
 // Registers block binding callback function for the post format name.
 if (!function_exists('twentytwentyfive_format_binding')):
 	/**
