@@ -297,6 +297,50 @@ function notify_clearing_cache_on_tag_edit($term_id, $tt_id)
 	]);
 }
 
+function pre_selecionar_posts_mesma_categoria($field)
+{
+	// Verifica se estamos editando um post
+	global $post;
+	if (!$post) {
+		return $field;
+	}
+
+	// Pega as categorias do post atual
+	$categorias = get_the_category($post->ID);
+	if (empty($categorias)) {
+		return $field;
+	}
+
+	// Pega o ID da primeira categoria (pode ajustar se quiser múltiplas)
+	$categoria_id = $categorias[0]->term_id;
+
+	// Busca os 3 posts mais recentes da mesma categoria
+	$args = array(
+		'post_type' => 'post',
+		'posts_per_page' => 3,
+		'post__not_in' => array($post->ID), // não incluir o próprio post
+		'orderby' => 'date',
+		'order' => 'DESC',
+		'tax_query' => array(
+			array(
+				'taxonomy' => 'category',
+				'field' => 'term_id',
+				'terms' => $categoria_id,
+			),
+		),
+	);
+
+	$recentes = get_posts($args);
+
+	if ($recentes) {
+		$field['default_value'] = wp_list_pluck($recentes, 'ID');
+	}
+
+	return $field;
+}
+
+// Troque 'seu_nome_do_campo' pelo field name (não o label) do ACF
+add_filter('acf/load_field/name=related_posts', 'pre_selecionar_posts_mesma_categoria');
 
 // Registers block binding callback function for the post format name.
 if (!function_exists('twentytwentyfive_format_binding')):
