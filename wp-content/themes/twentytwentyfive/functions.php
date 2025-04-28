@@ -297,7 +297,7 @@ function notify_clearing_cache_on_tag_edit($term_id, $tt_id)
 	]);
 }
 
-function pre_select_posts_same_category($field)
+function pre_select_related_posts_by_category($field)
 {
 	global $post;
 	if (!$post) {
@@ -326,24 +326,36 @@ function pre_select_posts_same_category($field)
 		),
 	);
 
-	$recents = get_posts($args);
+	$recent_posts = get_posts($args);
 
-	if ($recents) {
-		$field['default_value'] = wp_list_pluck($recents, 'ID');
+	if (!empty($recent_posts)) {
+		$field['default_value'] = wp_list_pluck($recent_posts, 'ID');
 	}
 
 	return $field;
 }
+add_filter('acf/load_field/name=related_posts', 'pre_select_related_posts_by_category');
 
-add_filter('acf/load_field/name=related_posts', 'pre_select_posts_same_category');
-
-function fill_acf_after_creating_post($post_id, $post, $update)
+// Auto-fill the ACF field when saving the post, only if the field is empty
+function auto_fill_related_posts_on_save($post_id, $post, $update)
 {
-	if ($update) {
+	// Prevent autosave and revisions
+	if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+		return;
+	}
+	if (wp_is_post_revision($post_id)) {
 		return;
 	}
 
+	// Only apply to posts
 	if ($post->post_type !== 'post') {
+		return;
+	}
+
+	// Check if the ACF field already has a value
+	$existing_value = get_field('related_posts', $post_id);
+	if (!empty($existing_value)) {
+		// Do not overwrite if user has manually selected related posts
 		return;
 	}
 
@@ -369,15 +381,14 @@ function fill_acf_after_creating_post($post_id, $post, $update)
 		),
 	);
 
-	$related = get_posts($args);
+	$related_posts = get_posts($args);
 
-	if ($related) {
-		$ids = wp_list_pluck($related, 'ID');
-		update_field('related_posts', $ids, $post_id);
+	if (!empty($related_posts)) {
+		$related_ids = wp_list_pluck($related_posts, 'ID');
+		update_field('related_posts', $related_ids, $post_id);
 	}
 }
-
-add_action('save_post', 'fill_acf_after_creating_post', 20, 3);
+add_action('save_post', 'auto_fill_related_posts_on_save', 20, 3);
 
 // Registers block binding callback function for the post format name.
 if (!function_exists('twentytwentyfive_format_binding')):
